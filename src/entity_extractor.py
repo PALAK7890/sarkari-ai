@@ -1,13 +1,25 @@
 import spacy
+from src.config import *
 
-from src.config import SPACY_MODEL
+nlp = None
 
-nlp = spacy.load(
-    SPACY_MODEL
-)
+
+def load_model():
+
+    global nlp
+
+    if nlp is None:
+
+        print("Loading spaCy model...")
+
+        nlp = spacy.load(
+            SPACY_MODEL
+        )
 
 
 def extract_entities(text):
+
+    load_model()
 
     doc = nlp(text)
 

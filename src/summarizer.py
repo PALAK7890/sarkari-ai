@@ -1,28 +1,54 @@
-from transformers import pipeline
-from src.config import (
-    SUMMARIZATION_MODEL,
-    MAX_SUMMARY_LENGTH,
-    MIN_SUMMARY_LENGTH
-)
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from src.config import *
 
-print("Loading summarization model...")
-
-summarizer = pipeline(
-    "summarization",
-    model=SUMMARIZATION_MODEL
-)
+tokenizer = None
+model = None
 
 
-def generate_summary(text: str) -> str:
+def load_model():
+    global tokenizer, model
+
+    if tokenizer is None:
+
+        print("Loading FLAN-T5...")
+
+        tokenizer = AutoTokenizer.from_pretrained(
+            SUMMARIZATION_MODEL
+        )
+
+        model = AutoModelForSeq2SeqLM.from_pretrained(
+            SUMMARIZATION_MODEL
+        )
+
+
+def generate_summary(text):
+
+    load_model()
+
+    prompt = f"""
+    Summarize the following text.
+    Use only information present in the text.
+    Do not add facts.
+
+    Text:
+    {text}
     """
-    Generate a plain-English summary.
-    """
 
-    result = summarizer(
-        text,
-        max_length=MAX_SUMMARY_LENGTH,
-        min_length=MIN_SUMMARY_LENGTH,
-        do_sample=False
+    inputs = tokenizer(
+        prompt,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
     )
 
-    return result[0]["summary_text"]
+    outputs = model.generate(
+        **inputs,
+        max_new_tokens=100
+    )
+
+    summary = tokenizer.decode(
+        outputs[0],
+        skip_special_tokens=True
+    )
+
+    return summary

@@ -1,45 +1,39 @@
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import CrossEncoder
+from scipy.special import expit
 
-from src.config import (
-    SIMILARITY_MODEL,
-    DIRECT_THRESHOLD,
-    PARTIAL_THRESHOLD
-)
+from src.config import *
 
-print("Loading similarity model...")
-
-model = SentenceTransformer(
-    SIMILARITY_MODEL
-)
+cross_encoder = None
 
 
-def detect_evasiveness(question: str, reply: str):
+def load_model():
+    global cross_encoder
 
-    q_embedding = model.encode([question])
+    if cross_encoder is None:
+        print("Loading CrossEncoder...")
+        cross_encoder = CrossEncoder(CROSS_ENCODER_MODEL)
 
-    r_embedding = model.encode([reply])
 
-    similarity = cosine_similarity(
-        q_embedding,
-        r_embedding
-    )[0][0]
+def detect_evasiveness(question, reply):
 
-    similarity = float(round(similarity, 3))
+    load_model()
 
-    if similarity >= DIRECT_THRESHOLD:
+    logit = cross_encoder.predict(
+        [(question, reply)]
+    )[0]
 
+    score = float(expit(logit))
+
+    if score >= DIRECT_THRESHOLD:
         verdict = "Direct Answer"
 
-    elif similarity >= PARTIAL_THRESHOLD:
-
+    elif score >= PARTIAL_THRESHOLD:
         verdict = "Partially Answered"
 
     else:
-
         verdict = "Highly Evasive"
 
     return {
-        "score": similarity,
+        "score": round(score, 3),
         "verdict": verdict
     }
