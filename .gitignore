@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual Environment
+.venv/
+venv/
+
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Models
+models/
+
+# Logs
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
+
+# Environment Variables
+.env
+
+# Test files
+.pytest_cache/
