@@ -1,0 +1,11 @@
+SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
+
+SIMILARITY_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+SPACY_MODEL = "en_core_web_sm"
+
+MAX_SUMMARY_LENGTH = 150
+MIN_SUMMARY_LENGTH = 40
+
+DIRECT_THRESHOLD = 0.60
+PARTIAL_THRESHOLD = 0.35
